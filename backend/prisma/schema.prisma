@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("Resident") // Admin | Committee | Resident
+  phone          String?
+  mailingAddress String?
+  status         String   @default("active")   // active | inactive
+  refreshToken String?
+  flatId       String?
+  flat         Flat?    @relation("PrimaryFlat", fields: [flatId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignedFlats       FlatMember[]
+  circularsCreated    Circular[]          @relation("CreatedBy")
+  circularsPublished  Circular[]          @relation("PublishedBy")
+  circularSignatures  CircularSignature[]
+  complaintsSubmitted Complaint[]         @relation("SubmittedBy")
+  complaintsAssigned  Complaint[]         @relation("AssignedTo")
+  comments            Comment[]
+  notifications       Notification[]
+  auditLogs           AuditLog[]
+  pollsCreated        Poll[]
+  pollVotes           PollVote[]
+}
+
+model Flat {
+  id            String   @id @default(uuid())
+  block         String   @default("1A")
+  unitNumber    Int
+  type          String   @default("2BHK")  // 1BHK | 2BHK | 3BHK | Other
+  ownershipType String   @default("Owner") // Owner | Tenant
+  status        String   @default("vacant") // occupied | vacant
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  primaryUsers    User[]       @relation("PrimaryFlat")
+  assignedMembers FlatMember[]
+  complaints      Complaint[]
+
+  @@unique([block, unitNumber])
+}
+
+// Many-to-many join table: which users are assigned to which flat
+model FlatMember {
+  flatId String
+  userId String
+  flat   Flat   @relation(fields: [flatId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([flatId, userId])
+}
+
+model Circular {
+  id            String    @id @default(uuid())
+  title         String
+  content       String
+  audience      String    @default("All") // All | Residents | Committee
+  status        String    @default("Draft") // Draft | Published
+  publishedAt   DateTime?
+  publishedById String?
+  publishedBy   User?     @relation("PublishedBy", fields: [publishedById], references: [id])
+  createdById   String
+  createdBy     User      @relation("CreatedBy", fields: [createdById], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  attachments CircularAttachment[]
+  signatures  CircularSignature[]
+}
+
+model CircularSignature {
+  id         String   @id @default(uuid())
+  circularId String
+  circular   Circular @relation(fields: [circularId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  signedAt   DateTime @default(now())
+  ipAddress  String?
+
+  @@unique([circularId, userId])
+}
+
+model CircularAttachment {
+  id           String   @id @default(uuid())
+  circularId   String
+  circular     Circular @relation(fields: [circularId], references: [id], onDelete: Cascade)
+  filename     String
+  originalName String
+  mimetype     String
+  size         Int
+  url          String
+}
+
+model Complaint {
+  id            String    @id @default(uuid())
+  title         String
+  description   String
+  category      String    // Plumbing | Electrical | Structural | Housekeeping | Security | Common Area | Other
+  priority      String    @default("Medium") // Low | Medium | High | Urgent
+  status        String    @default("Open")   // Open | InProgress | Resolved | Closed
+  flatId        String
+  flat          Flat      @relation(fields: [flatId], references: [id])
+  submittedById String
+  submittedBy   User      @relation("SubmittedBy", fields: [submittedById], references: [id])
+  assignedToId  String?
+  assignedTo    User?     @relation("AssignedTo", fields: [assignedToId], references: [id])
+  resolvedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  attachments ComplaintAttachment[]
+  comments    Comment[]
+}
+
+model ComplaintAttachment {
+  id           String    @id @default(uuid())
+  complaintId  String
+  complaint    Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  filename     String
+  originalName String
+  mimetype     String
+  size         Int
+  url          String
+}
+
+model Comment {
+  id          String    @id @default(uuid())
+  complaintId String
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  byId        String
+  by          User      @relation(fields: [byId], references: [id])
+  text        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String   // CIRCULAR_PUBLISHED | COMPLAINT_STATUS_CHANGED | COMPLAINT_ASSIGNED | COMPLAINT_COMMENT | GENERAL
+  message       String
+  isRead        Boolean  @default(false)
+  relatedEntity String?  // Circular | Complaint
+  relatedId     String?
+  createdAt     DateTime @default(now())
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  action        String
+  entity        String   // User | Flat | Circular | Complaint | Notification | Auth | Poll
+  entityId      String?
+  performedById String
+  performedBy   User     @relation(fields: [performedById], references: [id])
+  oldValue      String?  // JSON string
+  newValue      String?  // JSON string
+  ipAddress     String?
+  createdAt     DateTime @default(now())
+}
+
+// ─── Polls / Voting ────────────────────────────────────────────────────────────
+
+model Poll {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  status      String    @default("Draft")  // Draft | Active | Closed
+  audience    String    @default("All")    // All | Residents | Committee
+  endDate     DateTime?
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  options PollOption[]
+  votes   PollVote[]
+}
+
+model PollOption {
+  id      String @id @default(uuid())
+  pollId  String
+  poll    Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  text    String
+  order   Int    @default(0)
+
+  votes PollVote[]
+}
+
+model PollVote {
+  id       String     @id @default(uuid())
+  pollId   String
+  poll     Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  optionId String
+  option   PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User       @relation(fields: [userId], references: [id])
+  votedAt  DateTime   @default(now())
+
+  @@unique([pollId, userId])  // one vote per user per poll
+}
+
+// ─── Community Contacts ────────────────────────────────────────────────────────
+
+model CommunityContact {
+  id       String  @id @default(uuid())
+  category String  // e.g. Electrician | Plumber | Hospital | Ambulance …
+  name     String
+  phone    String?
+  phone2   String?
+  address  String?
+  notes    String?
+  icon     String? // emoji icon
+  order    Int     @default(0)
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

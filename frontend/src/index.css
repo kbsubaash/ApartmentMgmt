@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-brand text-white hover:bg-brand-dark focus:ring-brand;
+  }
+  .btn-secondary {
+    @apply btn bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-400;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  .input {
+    @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand;
+  }
+  .input-error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+  }
+  .label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  }
+  .page-title {
+    @apply text-2xl font-bold text-gray-900;
+  }
+}
+
+/* TipTap editor prose */
+.ProseMirror {
+  @apply min-h-[200px] p-3 outline-none;
+}
+.ProseMirror p { @apply mb-2; }
+.ProseMirror h1 { @apply text-2xl font-bold mb-2; }
+.ProseMirror h2 { @apply text-xl font-bold mb-2; }
+.ProseMirror h3 { @apply text-lg font-bold mb-2; }
+.ProseMirror ul { @apply list-disc ml-5 mb-2; }
+.ProseMirror ol { @apply list-decimal ml-5 mb-2; }

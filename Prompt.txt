@@ -1,0 +1,66 @@
+
+I am a senior software engineer building a full-stack web-based application to manage
+apartment association administrative activities.
+
+Use Aparment association name as " DABC Euphorbia Phase 3 Apartment Owners Welfare Association " 
+
+Please help me design and implement a modular, scalable system using:
+
+Frontend:
+- React with functional components and hooks
+- React Router for navigation
+- Role-based UI rendering
+- Responsive design suitable for mobile and desktop
+- Dashboards for admins and residents
+
+Backend:
+- Node.js with Express
+- RESTful APIs
+- JWT-based authentication and authorization
+- Role-based access control (Admin, Committee, Resident)
+- Modular service-oriented backend structure
+
+Core Features:
+- Member and flat management
+- Circular creation and publishing (including Word document upload and parsing)
+- Maintenance billing and payment tracking
+- Complaint and maintenance request management
+- Committee member and meeting management
+- Secure document management
+- Reports and dashboards
+
+Data Layer:
+- Use MongoDB or PostgreSQL
+- Proper schema design and indexing
+- Audit logs for critical operations
+
+Other Requirements:
+- Proper folder structure
+- Error handling and validations
+- Environment-based configuration
+- README with local setup instructions
+
+Generate:
+- Suggested architecture
+- Folder structure for frontend and backend
+- Sample API contracts
+- Example React components
+- Example database schemas
+``
+
+Build a react UI and Node js backend to implement
+ 
+please ask any question or clarification to build this application.
+
+i want to make this available over internet for the owners to signin from their remote places.. what should be done... explain the steps first before making any changes to the files...
+
+Email: admin@dabc-euphorbia.com
+Password: Admin@1234
+
+Add an option for members able to vote for or against with a poll or survey option available. this is mainly to have decisions taken with member approvals thru online web application itself and avoid in person meetings... also add an option for members to digitally sign the circulars that are being shared to the members by the comittee
+
+Add a feature to add member details like Contact phone number, email address, mailing address to all the users who signup . However, the personal details should be visible only to the commitee members.
+
+Add an option to send an email to the members/ tenants on non payment of maintenance by tenants
+
+Add banners on the home page to add details on the contact details for Electrician, plumber, post office , hospital, Ambulance, house keeping, local councellor, panchayat head, fireservice, Auto rickshaw, Cab provider, Ironing shop, Medical shop, Internet provider, EB person 
