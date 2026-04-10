@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: apartment-mgmt-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        scope: build
+      - key: JWT_SECRET
+        scope: build
+      - key: MAIL_HOST
+        scope: build
+      - key: MAIL_PORT
+        scope: build
+      - key: MAIL_USER
+        scope: build
+      - key: MAIL_PASS
+        scope: build
+      - key: CLIENT_ORIGIN
+        value: https://apartment-mgmt-frontend.onrender.com
+    autoDeploy: true
+
+  - type: web
+    name: apartment-mgmt-frontend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: VITE_API_URL
+        value: https://apartment-mgmt-backend.onrender.com/api
+    autoDeploy: true
