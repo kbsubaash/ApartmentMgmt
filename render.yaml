@@ -13,29 +13,29 @@ services:
       - key: PORT
         value: 5000
       - key: DATABASE_URL
-        scope: build
+        value: postgresql://postgres:password@host:5432/apartment_mgmt
       - key: JWT_ACCESS_SECRET
-        scope: build
+        value: your-jwt-access-secret-here
       - key: JWT_REFRESH_SECRET
-        scope: build
+        value: your-jwt-refresh-secret-here
       - key: JWT_ACCESS_EXPIRY
         value: 15m
       - key: JWT_REFRESH_EXPIRY
         value: 7d
       - key: MAIL_HOST
-        scope: build
+        value: smtp.gmail.com
       - key: MAIL_PORT
-        scope: build
+        value: "587"
       - key: MAIL_USER
-        scope: build
+        value: your-email@gmail.com
       - key: MAIL_PASS
-        scope: build
+        value: your-app-password
       - key: MAIL_FROM
         value: no-reply@dabc-euphorbia.com
       - key: CLIENT_ORIGIN
         value: https://apartment-mgmt-frontend.onrender.com
       - key: SENTRY_DSN
-        scope: build
+        value: ""
     autoDeploy: true
 
   - type: web
@@ -50,3 +50,6 @@ services:
       - key: VITE_API_URL
         value: https://apartment-mgmt-backend.onrender.com/api
     autoDeploy: true
+git add render.yaml
+git commit -m "Add render.yaml"
+git push
