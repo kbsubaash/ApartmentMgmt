@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
     rootDir: backend
-    buildCommand: npm install && npx prisma generate
+    buildCommand: npm install
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
@@ -14,7 +14,6 @@ services:
         value: 5000
       - key: DATABASE_URL
         value: postgresql://postgres:password@host:5432/apartment_mgmt
-        scope: build
       - key: JWT_ACCESS_SECRET
         value: your-jwt-access-secret-here
       - key: JWT_REFRESH_SECRET
