@@ -50,6 +50,3 @@ services:
       - key: VITE_API_URL
         value: https://apartment-mgmt-backend.onrender.com/api
     autoDeploy: true
-git add render.yaml
-git commit -m "Add render.yaml"
-git push
