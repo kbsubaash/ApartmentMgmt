@@ -1,24 +1,33 @@
 require('dotenv').config();
 const { execSync } = require('child_process');
-const fs = require('fs');
 const path = require('path');
+
+// Generate Prisma client BEFORE any other requires
+console.log('Checking/generating Prisma Client...');
+try {
+  execSync('npx prisma generate', { 
+    stdio: 'inherit',
+    cwd: __dirname 
+  });
+  console.log('Prisma Client ready');
+} catch (err) {
+  console.log('Note: Prisma generation attempted:', err.message);
+}
+
+// NOW require the rest
 const app = require('./src/app');
 const prisma = require('./src/config/prisma');
 
 const PORT = process.env.PORT || 5000;
 
-// Run migrations and generate Prisma client before connecting
+// Run migrations on startup
 async function startServer() {
   try {
-    // Check if Prisma client is generated
-    const prismaClientPath = path.join(__dirname, 'node_modules', '@prisma', 'client');
-    if (!fs.existsSync(prismaClientPath)) {
-      console.log('Generating Prisma Client...');
-      execSync('npx prisma generate', { stdio: 'inherit' });
-    }
-    
     console.log('Running Prisma migrations...');
-    execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+    execSync('npx prisma migrate deploy', { 
+      stdio: 'inherit',
+      cwd: __dirname 
+    });
     console.log('Migrations completed');
   } catch (err) {
     console.log('Migration info:', err.message);
