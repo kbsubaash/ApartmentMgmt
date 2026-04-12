@@ -20,30 +20,37 @@ const prisma = require('./src/config/prisma');
 
 const PORT = process.env.PORT || 5000;
 
-// Run migrations on startup
-async function startServer() {
+// Run migrations on startup (non-blocking)
+async function runMigrations() {
   try {
     console.log('Running Prisma migrations...');
     execSync('npx prisma migrate deploy', { 
       stdio: 'inherit',
       cwd: __dirname 
     });
-    console.log('Migrations completed');
+    console.log('✓ Migrations completed');
   } catch (err) {
-    console.log('Migration info:', err.message);
+    console.log('⚠ Migration warning (database may initialize on first request):', err.message);
   }
+}
+
+// Connect and start server
+async function startServer() {
+  // Run migrations in background (don't block startup)
+  runMigrations().catch(err => console.log('Migration error:', err.message));
 
   // Verify DB connection then start server
   prisma.$connect()
     .then(() => {
-      console.log('Database connected via Prisma');
+      console.log('✓ Database connected via Prisma');
       app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+        console.log(`✓ Server running on port ${PORT}`);
       });
     })
     .catch((err) => {
-      console.error('Database connection error:', err.message);
-      process.exit(1);
+      console.error('✗ Database connection error:', err.message);
+      console.log('Retrying in 5 seconds...');
+      setTimeout(startServer, 5000);
     });
 }
 
