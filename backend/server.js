@@ -30,7 +30,22 @@ async function runMigrations() {
     });
     console.log('✓ Migrations completed');
   } catch (err) {
-    console.log('⚠ Migration warning (database may initialize on first request):', err.message);
+    console.log('⚠ Migration issue detected, attempting resolve...');
+    try {
+      // Try to resolve failed migrations
+      execSync('npx prisma migrate resolve --rolled-back 20260408175332_init', { 
+        stdio: 'inherit',
+        cwd: __dirname 
+      });
+      // Try again
+      execSync('npx prisma migrate deploy', { 
+        stdio: 'inherit',
+        cwd: __dirname 
+      });
+      console.log('✓ Migrations resolved and completed');
+    } catch (resolveErr) {
+      console.log('⚠ Migration warning:', resolveErr.message);
+    }
   }
 }
 
